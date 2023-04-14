@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- displays site properly based on user's device -->
+  <link rel="stylesheet" href="index.css">
+  <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
+  <title>Frontend Mentor | Interactive comments section</title>
+</head>
+<body>
+  <nav class="scroll">
+      <h1 class="fade-in">Interactive Comment Section</h1>
+  </nav>
+  <ul class="comments-container">
+    <!--<li class="comment-box">
+      <div class="user-details box">
+        <picture>
+          <source 
+            srcset="./images/avatars/image-amyrobson.webp"
+            media="(min-width: 969px)"/>
+          <source 
+            srcset="./images/avatars/image-amyrobson.png"
+            media="(min-width: 375px)"/>
+          <img 
+            src="./images/avatars/image-amyrobson.png" 
+            alt="user_name"/>
+        </picture>
+        <p class="name">lexthedev00_</p>
+        <p class="timestamp">just now</p>
+      </div>
+      
+      <div class="comment box">
+        <p>lorem ipsum the whole time but it was the whole time. <br /> I have been well since the whole time but it was the whole time but. <br> But yh, it is well!</p>
+      </div>
+      
+      <div class="actions box">
+        <span class="reply"><iconify-icon icon="basil:reply-solid"></iconify-icon>Reply</span>
+      </div>
+      
+      <div class="votes box">
+        <iconify-icon class="plus" icon="ic:baseline-plus"></iconify-icon>
+        <p>12</p>
+        <iconify-icon class="minus" icon="ic:baseline-minus"></iconify-icon>
+      </div>
+    </li>-->
+  </ul>
+  
+  <!--<ul class="reply-container">
+    <li class="comment-box">
+      <div class="user-details box">
+        <picture>
+          <source 
+            srcset="./images/avatars/image-amyrobson.webp"
+            media="(min-width: 969px)"/>
+          <source 
+            srcset="./images/avatars/image-amyrobson.png"
+            media="(min-width: 375px)"/>
+          <img 
+            src="./images/avatars/image-amyrobson.png" 
+            alt="user_name"/>
+        </picture>
+        <p class="name">lexthedev00_</p>
+        <p class="timestamp">just now</p>
+      </div>
+      
+      <div class="comment box">
+        <p>lorem ipsum the whole time but it was the whole time. <br /> I have been well since the whole time but it was the whole time but. <br> But yh, it is well!</p>
+      </div>
+      
+      <div class="actions box">
+        <span class="delete"><iconify-icon icon="ic:baseline-delete"></iconify-icon>Delete</span>
+        <span class="edit"><iconify-icon icon="ic:round-mode-edit"></iconify-icon>Edit</span>
+      </div>
+      
+      <div class="votes box">
+        <iconify-icon class="plus" icon="ic:baseline-plus"></iconify-icon>
+        <p>12</p>
+        <iconify-icon class="minus" icon="ic:baseline-minus"></iconify-icon>
+      </div>
+    </li>
+  </ul>-->
+  
+  <div class="input-box scroll">
+    <picture>
+          <source 
+            srcset="./images/avatars/image-juliusomo.webp"
+            media="(min-width: 969px)"/>
+          <source 
+            srcset="./images/avatars/image-juliusomo.png"
+            media="(min-width: 375px)"/>
+          <img 
+            src="./images/avatars/image-juliusomo.png" 
+            alt="user_name"/>
+    </picture>
+    
+    <textarea id="comment-input" placeholder="Write a comment"></textarea>
+    
+    <button type="#">SEND</button>
+  </div>
+  
+  <div class="intersect-trap"></div>
+  
+  <script src="./index.js"></script>
+</body>
+</html>
