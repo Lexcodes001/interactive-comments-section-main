@@ -12,76 +12,24 @@
   <nav class="scroll">
       <h1 class="fade-in">Interactive Comment Section</h1>
   </nav>
-  <ul class="comments-container">
-    <!--<li class="comment-box">
-      <div class="user-details box">
-        <picture>
-          <source 
-            srcset="./images/avatars/image-amyrobson.webp"
-            media="(min-width: 969px)"/>
-          <source 
-            srcset="./images/avatars/image-amyrobson.png"
-            media="(min-width: 375px)"/>
-          <img 
-            src="./images/avatars/image-amyrobson.png" 
-            alt="user_name"/>
-        </picture>
-        <p class="name">lexthedev00_</p>
-        <p class="timestamp">just now</p>
-      </div>
-      
-      <div class="comment box">
-        <p>lorem ipsum the whole time but it was the whole time. <br /> I have been well since the whole time but it was the whole time but. <br> But yh, it is well!</p>
-      </div>
-      
-      <div class="actions box">
-        <span class="reply"><iconify-icon icon="basil:reply-solid"></iconify-icon>Reply</span>
-      </div>
-      
-      <div class="votes box">
-        <iconify-icon class="plus" icon="ic:baseline-plus"></iconify-icon>
-        <p>12</p>
-        <iconify-icon class="minus" icon="ic:baseline-minus"></iconify-icon>
-      </div>
-    </li>-->
-  </ul>
+  <ul class="comments-container"></ul>
   
-  <!--<ul class="reply-container">
-    <li class="comment-box">
-      <div class="user-details box">
-        <picture>
-          <source 
-            srcset="./images/avatars/image-amyrobson.webp"
-            media="(min-width: 969px)"/>
-          <source 
-            srcset="./images/avatars/image-amyrobson.png"
-            media="(min-width: 375px)"/>
-          <img 
-            src="./images/avatars/image-amyrobson.png" 
-            alt="user_name"/>
-        </picture>
-        <p class="name">lexthedev00_</p>
-        <p class="timestamp">just now</p>
+  <div class="modal-container">
+    <div class="modal-box">
+      <header>Delete comment</header>
+      <p class="info"></p>
+      <div class="btns">
+        <button>NO, CANCEL</button>
+        <button>YES, DELETE</button>
       </div>
-      
-      <div class="comment box">
-        <p>lorem ipsum the whole time but it was the whole time. <br /> I have been well since the whole time but it was the whole time but. <br> But yh, it is well!</p>
-      </div>
-      
-      <div class="actions box">
-        <span class="delete"><iconify-icon icon="ic:baseline-delete"></iconify-icon>Delete</span>
-        <span class="edit"><iconify-icon icon="ic:round-mode-edit"></iconify-icon>Edit</span>
-      </div>
-      
-      <div class="votes box">
-        <iconify-icon class="plus" icon="ic:baseline-plus"></iconify-icon>
-        <p>12</p>
-        <iconify-icon class="minus" icon="ic:baseline-minus"></iconify-icon>
-      </div>
-    </li>
-  </ul>-->
+    </div>
+  </div>
   
   <div class="input-box scroll">
+    <p class=""></p>
+    
+    <textarea id="comment-input"></textarea>
+    
     <picture>
           <source 
             srcset="./images/avatars/image-juliusomo.webp"
@@ -93,8 +41,6 @@
             src="./images/avatars/image-juliusomo.png" 
             alt="user_name"/>
     </picture>
-    
-    <textarea id="comment-input" placeholder="Write a comment"></textarea>
     
     <button type="#">SEND</button>
   </div>

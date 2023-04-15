@@ -3,9 +3,13 @@ timestamp = document.querySelector(".user-details .timestamp"),
 commentContainer = document.querySelector(".comments-container"),
 commentBox = document.querySelector(".comment-box .comment"),
 inputBox = document.querySelector('.input-box'),
+inputInfo = document.querySelector('.input-box p'),
 userInput = document.querySelector(".input-box textarea"),
 addBtn = document.querySelector(".input-box button"),
-intersectTrap = document.querySelector('.intersect-trap');
+intersectTrap = document.querySelector('.intersect-trap'),
+modalContainer = document.querySelector('.modal-container'),
+modalInfo = document.querySelector('p.info'),
+modalBtns = document.querySelectorAll('.btns button');
 
 
 let comments = JSON.parse(localStorage.getItem("comments"));
@@ -137,15 +141,28 @@ if (!isUpdate) {
 console.log(comments);
 
 function deleteNote(contentId, isComment, replyId) {
-  console.log('replyId', replyId);
-    let confirmDel = confirm("Are you sure you want to delete this note?");
-    if(!confirmDel) return;
-    if (isComment) {
-      comments.splice(contentId, 1);
-    } else {
-      comments[contentId].replies.splice(replyId, 1);
+    modalInfo.innerHTML = `Are you sure you want to delete this ${isComment == true? 'comment' : 'reply'}? This will remove the ${isComment == true? 'comment' : 'reply'} and can't be undone.`;
+    
+    modalContainer.classList.add('disp');
+
+    for (let i = 0; i < modalBtns.length; i++) {
+      modalBtns[i].addEventListener('click', function () {
+        let isDelete = i == 0 ? false : true;
+
+        if(!isDelete) {
+          modalContainer.classList.remove('disp');
+          return;
+        } else {
+          if (isComment) {
+            comments.splice(contentId, 1);
+          } else {
+            comments[contentId].replies.splice(replyId, 1);
+          }
+          modalContainer.classList.remove('disp');
+          localStorage.setItem("comments", JSON.stringify(comments));
+        }
+      });
     }
-    localStorage.setItem("comments", JSON.stringify(comments));
 }
 
 function replyComment(commentId, isComment, replyId) {
@@ -154,12 +171,14 @@ function replyComment(commentId, isComment, replyId) {
     userInput.focus();
     updateCommentId = commentId;
     replyingTo = comments[commentId].user.username;
+    checkInfo(false, false, '', `${replyingTo}`);
   } else {
     isReply = true;
     userInput.focus();
     updateCommentId = commentId;
     updateReplyId = replyId;
     replyingTo = comments[commentId].replies[replyId].user.username;
+    checkInfo(false, false, '', `${replyingTo}`);
   }
   addBtn.innerText = 'Reply';
   userInput.nextElementSibling.classList.remove('disabled');
@@ -174,6 +193,7 @@ function editNote(itemId, isComment, replyId) {
     userInput.focus();
     addBtn.innerText = 'Update';
     userInput.nextElementSibling.classList.remove('disabled');
+    checkInfo(false, true, `${filterContent}`, '', false);
   } else {
     filterContent = comments[itemId].replies[replyId].content.replaceAll("<br/>", '\r\n');
     isUpdate = true;
@@ -184,6 +204,7 @@ function editNote(itemId, isComment, replyId) {
     userInput.focus();
     addBtn.innerText = 'Update';
     userInput.nextElementSibling.classList.remove('disabled');
+    checkInfo(false, true, `${filterContent}`, '', true);
   }
 }
 
@@ -245,15 +266,17 @@ function updateTimeStamp(createDate) {
   }
 }
 
-userInput.nextElementSibling.classList.add('disabled');
+userInput.nextElementSibling.nextElementSibling.classList.add('disabled');
 
 userInput.addEventListener('keyup', function () {
   if (this.value == '') {
-    this.nextElementSibling.classList.add('disabled');
+    this.nextElementSibling.nextElementSibling.classList.add('disabled');
   } else {
-    this.nextElementSibling.classList.remove('disabled');
+    this.nextElementSibling.nextElementSibling.classList.remove('disabled');
   }
 });
+
+
 
 addBtn.addEventListener("click", function () {
     let content = userInput.value.trim();
@@ -278,7 +301,8 @@ addBtn.addEventListener("click", function () {
           }
           comments = comments.filter(item => item != null);
           comments.push(commentInfo);
-          console.log(commentInfo);
+          console.log(content);
+          checkInfo(true, false, `${content}`, '', false, false);
           scrollHere(`${(comments.length) - 1}`, false);
         }
       } else {
@@ -287,10 +311,12 @@ addBtn.addEventListener("click", function () {
         if (!isUpdateReply) {
           comments[updateCommentId].content = content;
           scrollHere(updateCommentId, true, true);
+          checkInfo(true, false, `${comments[updateCommentId].content}`, ``, false, true);
         } else {
           isUpdateReply = false;
           comments[updateCommentId].replies[updateReplyId].content = content;
           scrollHere(updateReplyId, false, true);
+          checkInfo(true, false, ``, `${comments[updateCommentId].replies[updateReplyId].replyingTo}`, true, true);
         }
       }
     } else {
@@ -315,6 +341,7 @@ addBtn.addEventListener("click", function () {
           comments[updateCommentId].replies.push(replyInfo);
           console.log(replyInfo);
           scrollHere(`${(comments.length) - 1}`, false);
+          checkInfo(true, false, `${content}`, `${replyInfo.replyingTo}`, true, false);
         }
     }
     
@@ -324,30 +351,78 @@ addBtn.addEventListener("click", function () {
     userInput.nextElementSibling.classList.add('disabled');
 });
 
+function checkInfo(isAddingComment, isEditing, filterContent, replyingTo, isReplying, isEdited) {
+  let info, timeout;
+  
+  if (isEditing) {
+    info = `You are currently editing this ${isReplying ? 'reply' : 'comment'}: '<span class='bold'>${filterContent.slice(0,15).trim()}</span>...'`;
+    inputInfo.innerHTML = info;
+  } else {
+    if (isAddingComment) {
+      info = `You just ${ isEdited == true ? "edited" : `${ isReplying == true ? `` : `added a new`}`} ${ isReplying == true ? `${isEdited ? `your reply` : `replied`} to <span class="bold">@${replyingTo}</span>...` : `${isEdited ? 'this' : ''} comment: <span class="bold">${filterContent.slice(0,15).trim()}</span>...`}`;
+      inputInfo.innerHTML = info;
+      timeout = setTimeout(function() {
+        inputInfo.innerHTML = '';
+        typeEffect();
+      }, 5000);
+    } else {
+      info = `You are currently replying to <span class="bold">@${replyingTo}</span>`;
+      inputInfo.innerHTML = info;
+    }
+  }
+}
 
+let i = 0, speed = 100, defaultInfo;
+
+function typingEffect(textOne) {
+  if (i <= textOne.length) {
+    inputInfo.innerHTML += textOne.charAt(i);
+    i++;
+    setTimeout(typingEffect, speed);
+  } else {
+    i = 0;
+    typeEffect();
+  }
+}
+
+function typeEffect() {
+  defaultInfo = 'Write a comment below...';
+  if (i <= defaultInfo.length) {
+      inputInfo.innerHTML += defaultInfo.charAt(i);
+      i++;
+      setTimeout(typeEffect, speed);
+  } else {
+    i = 0;
+  }
+}
+typeEffect();
 
 userInput.addEventListener('keyup', function() {
-  this.style.removeProperty('height');
-  this.style.height = (this.scrollHeight + 2) + 'px';
+  if (this.value == '') {
+    this.style.height = '3rem';
+  } else {
+    this.style.removeProperty('height');
+    this.style.height = (this.scrollHeight + 2) + 'px';
+  }
 });
 
-userInput.addEventListener('mousedown', function() {
-  this.style.removeProperty('height');
-  this.style.height = (this.scrollHeight + 2) + 'px';
+userInput.addEventListener('keydown', function() {
+  if (this.value == '') {
+    this.style.height = '3rem';
+  } else {
+    this.style.removeProperty('height');
+    this.style.height = (this.scrollHeight + 2) + 'px';
+  }
 });
-
-
 
 //to check when element get's position sticky
 var observer = new IntersectionObserver(function(entries) {
   // no intersection 
   if (entries[0].intersectionRatio === 0) {
-    //alert('Is sticky!');
     inputBox.classList.add("is-sticky");
   }
   // fully intersects 
   else if (entries[0].intersectionRatio === 1) {
-    //alert('Is not sticky!');
     inputBox.classList.remove("is-sticky");
   }
 }, {
@@ -376,13 +451,11 @@ const isScrollingDown = () => {
 
 const handleScroll = () => {
   if (isScrollingDown()) {
-    //console.log("scrolling-down");
     scrollElements[0].classList.remove('fade-in-top-one');
     scrollElements[0].classList.add('fade-in-bottom-one');
     scrollElements[1].classList.remove('fade-in-bottom');
     scrollElements[1].classList.add('fade-in-top');
   } else {
-    //console.log("scrolling-up");
     scrollElements[0].classList.remove('fade-in-bottom-one');
     scrollElements[0].classList.add('fade-in-top-one');
     scrollElements[1].classList.remove('fade-in-top');
@@ -390,8 +463,6 @@ const handleScroll = () => {
   }
 };
 
-// throttle function from lodash library
-//const scrollThrottle = _.throttle(handleScroll, 100);
 window.addEventListener("scroll", function(e) {
   if (((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 100)  || (userInput == document.activeElement)) {
     //scrollElements[0].classList.remove('fade-in-bottom-one');
