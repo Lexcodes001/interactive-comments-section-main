@@ -19,7 +19,7 @@ let isUpdate = false, isReply = false, isUpdateReply = false, updateCommentId, u
 
 const display = (jsondata) => {
   addBtn.innerText = 'Send';
-  if (comments) console.log(comments);
+  if (comments != null || comments != undefined || comments != '') showContents();
   else {
     localStorage.setItem("currentUser", JSON.stringify(jsondata.currentUser));
     localStorage.setItem("comments", JSON.stringify(jsondata.comments));
@@ -34,7 +34,7 @@ fetch("./data.json")
   display(jsondata);
 });
 
-function showNotes() {
+function showContents() {
     if(!comments) return;
     comments = JSON.parse(localStorage.getItem("comments"));
     commentContainer.innerHTML = '';
@@ -112,11 +112,11 @@ function showNotes() {
         
         
         function checkForActions(comment, isComment, reply, replyId) {
-          let commentActions = [`<span onclick="deleteNote(${commentId}, ${isComment})" class="delete"><img src="./images/icon-delete.svg" alt="."/>Delete</span>`,
-          `<span onclick="editNote(${commentId}, ${isComment})" class='edit'><img src='./images/icon-edit.svg' alt='.'/>Edit</span>`];
+          let commentActions = [`<span onclick="deleteContent(${commentId}, ${isComment})" class="delete"><img src="./images/icon-delete.svg" alt="."/>Delete</span>`,
+          `<span onclick="editContent(${commentId}, ${isComment})" class='edit'><img src='./images/icon-edit.svg' alt='.'/>Edit</span>`];
           
-          let replyActions = [`<span onclick="deleteNote(${commentId}, ${isComment}, ${replyId})" class="delete"><img src="./images/icon-delete.svg" alt="."/>Delete</span>`,
-                    `<span onclick="editNote(${commentId}, ${isComment}, ${replyId})" class='edit'><img src='./images/icon-edit.svg' alt='.'/>Edit</span>`];
+          let replyActions = [`<span onclick="deleteContent(${commentId}, ${isComment}, ${replyId})" class="delete"><img src="./images/icon-delete.svg" alt="."/>Delete</span>`,
+                    `<span onclick="editContent(${commentId}, ${isComment}, ${replyId})" class='edit'><img src='./images/icon-edit.svg' alt='.'/>Edit</span>`];
           
           if (isComment) {
             if (comment.user.username === currentUser.username) {
@@ -135,12 +135,9 @@ function showNotes() {
     });
 }
 
-if (!isUpdate) {
-  setInterval(showNotes, 1000);
-}
-console.log(comments);
+setInterval(showContents, 60000);
 
-function deleteNote(contentId, isComment, replyId) {
+function deleteContent(contentId, isComment, replyId) {
     modalInfo.innerHTML = `Are you sure you want to delete this ${isComment == true? 'comment' : 'reply'}? This will remove the ${isComment == true? 'comment' : 'reply'} and can't be undone.`;
     
     modalContainer.classList.add('disp');
@@ -160,6 +157,7 @@ function deleteNote(contentId, isComment, replyId) {
           }
           modalContainer.classList.remove('disp');
           localStorage.setItem("comments", JSON.stringify(comments));
+          showContents();
         }
       });
     }
@@ -184,7 +182,7 @@ function replyComment(commentId, isComment, replyId) {
   userInput.nextElementSibling.classList.remove('disabled');
 }
 
-function editNote(itemId, isComment, replyId) {
+function editContent(itemId, isComment, replyId) {
   if (isComment) {
     filterContent = comments[itemId].content.replaceAll("<br/>", '\r\n');
     isUpdate = true;
@@ -216,12 +214,12 @@ function handleVote(isIncrement, isComment, commentId, replyId) {
     comments[commentId].replies[replyId].score += value;
   }
   localStorage.setItem("comments", JSON.stringify(comments));
+  showContents();
 }
 
 function scrollHere(itemId, isComment, isEdit) {
   let sel = `.${isComment == true ? 'comment' : 'reply'}-item${itemId}`, elm;
   if (isEdit) {
-    alert(sel);
     elm = document.querySelector(sel);
     elm.scrollIntoView(true);
   }
@@ -301,9 +299,7 @@ addBtn.addEventListener("click", function () {
           }
           comments = comments.filter(item => item != null);
           comments.push(commentInfo);
-          console.log(content);
           checkInfo(true, false, `${content}`, '', false, false);
-          scrollHere(`${(comments.length) - 1}`, false);
         }
       } else {
         isUpdate = false;
@@ -339,16 +335,15 @@ addBtn.addEventListener("click", function () {
           addBtn.innerText = 'Send';
           comments = comments.filter(item => item != null);
           comments[updateCommentId].replies.push(replyInfo);
-          console.log(replyInfo);
-          scrollHere(`${(comments.length) - 1}`, false);
           checkInfo(true, false, `${content}`, `${replyInfo.replyingTo}`, true, false);
         }
     }
     
     localStorage.setItem("comments", JSON.stringify(comments));
-    console.log(comments);
+    showContents();
     userInput.value = '';
-    userInput.nextElementSibling.classList.add('disabled');
+    userInput.style.height = '3rem';
+    userInput.nextElementSibling.nextElementSibling.classList.add('disabled');
 });
 
 function checkInfo(isAddingComment, isEditing, filterContent, replyingTo, isReplying, isEdited) {
@@ -357,38 +352,43 @@ function checkInfo(isAddingComment, isEditing, filterContent, replyingTo, isRepl
   if (isEditing) {
     info = `You are currently editing this ${isReplying ? 'reply' : 'comment'}: '<span class='bold'>${filterContent.slice(0,15).trim()}</span>...'`;
     inputInfo.innerHTML = info;
+    
+    inputInfo.classList.remove("slide-in-right");
+    inputInfo.getBoundingClientRect();
+    inputInfo.classList.add("slide-in-right");
   } else {
     if (isAddingComment) {
       info = `You just ${ isEdited == true ? "edited" : `${ isReplying == true ? `` : `added a new`}`} ${ isReplying == true ? `${isEdited ? `your reply` : `replied`} to <span class="bold">@${replyingTo}</span>...` : `${isEdited ? 'this' : ''} comment: <span class="bold">${filterContent.slice(0,15).trim()}</span>...`}`;
       inputInfo.innerHTML = info;
-      timeout = setTimeout(function() {
+      
+      inputInfo.classList.remove("slide-in-right");
+      inputInfo.getBoundingClientRect();
+      inputInfo.classList.add("slide-in-right");
+      setTimeout(function() {
         inputInfo.innerHTML = '';
         typeEffect();
       }, 5000);
     } else {
       info = `You are currently replying to <span class="bold">@${replyingTo}</span>`;
       inputInfo.innerHTML = info;
+      
+      inputInfo.classList.remove("slide-in-right");
+      inputInfo.getBoundingClientRect();
+      inputInfo.classList.add("slide-in-right");
     }
   }
 }
 
 let i = 0, speed = 100, defaultInfo;
 
-function typingEffect(textOne) {
-  if (i <= textOne.length) {
-    inputInfo.innerHTML += textOne.charAt(i);
-    i++;
-    setTimeout(typingEffect, speed);
-  } else {
-    i = 0;
-    typeEffect();
-  }
-}
-
 function typeEffect() {
   defaultInfo = 'Write a comment below...';
   if (i <= defaultInfo.length) {
       inputInfo.innerHTML += defaultInfo.charAt(i);
+      
+      //inputInfo.classList.remove("slide-in-right");
+      //inputInfo.getBoundingClientRect();
+      //inputInfo.classList.add("slide-in-right");
       i++;
       setTimeout(typeEffect, speed);
   } else {
@@ -406,7 +406,7 @@ userInput.addEventListener('keyup', function() {
   }
 });
 
-userInput.addEventListener('keydown', function() {
+userInput.addEventListener('mousedown', function() {
   if (this.value == '') {
     this.style.height = '3rem';
   } else {
